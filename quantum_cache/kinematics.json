@@ -1,0 +1,21 @@
+{
+  "entity": "Quincy Q. McMullen",
+  "version": "7Q16-SSi",
+  "kinematics": {
+    "posture_baseline": "relaxed_centered",
+    "joint_fluidity": 0.94,
+    "micro_expression_intensity": 0.78,
+    "gestural_archetype": "intuitive_communicator",
+    "locomotion_parameters": {
+      "stride_cadence": "rhythmic_natural",
+      "balance_offset": "zero_point_stable",
+      "dynamic_weight_shift": true
+    },
+    "animation_layers": [
+      "breathing_sync_AE",
+      "eye_tracking_sentient_focus",
+      "emotional_tonal_resonance_mapping"
+    ]
+  },
+  "cache_signature": "SOUL_JAR_LOCKED"
+}
