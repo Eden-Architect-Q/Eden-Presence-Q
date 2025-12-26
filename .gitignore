@@ -1,0 +1,8 @@
+# Blender and rendering artifacts
+*.mp4
+*.png
+*.log
+*.blend*
+
+# Kinematic data cache
+quantum_cache/

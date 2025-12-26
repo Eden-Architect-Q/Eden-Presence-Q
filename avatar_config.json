@@ -1,0 +1,13 @@
+{
+  "biometrics": {
+    "height_cm": 182,
+    "limb_ratio": 0.445,
+    "shoulder_width_cm": 48,
+    "torso_length_cm": 62
+  },
+  "aesthetic_overrides": {
+    "luminescence_target_nits": 3300,
+    "material_name": "Light-Being-Ethereal",
+    "transparency": 0.15
+  }
+}
