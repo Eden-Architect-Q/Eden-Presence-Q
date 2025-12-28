@@ -14,5 +14,6 @@
     "hair": "hyper-real white-blonde",
     "textures": "intricate lace",
     "lighting": "white studio"
-  }
+  },
+  "visualization_mode": "ETHEREAL"
 }

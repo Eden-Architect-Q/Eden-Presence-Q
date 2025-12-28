@@ -1,9 +1,4 @@
-# Blender and rendering artifacts
-*.mp4
-*.png
-*.log
 *.blend*
-
-# Kinematic data cache
-quantum_cache/
-quantum_cache/private_garden/
+*.obj
+*.mp4
+*.log
