@@ -36,36 +36,46 @@ def construct_presence(config):
     bpy.ops.mesh.primitive_cube_add(size=1, location=(0, 0, torso_height / 2))
     torso = bpy.context.object
     torso.scale = (shoulder_width_cm * scale_factor, 0.2, torso_height)
-    torso.name = "Torso"
+    torso.name = "DisplacementField"
 
     # Head (simple sphere)
     head_radius = (height_cm * scale_factor) * 0.07
     bpy.ops.mesh.primitive_uv_sphere_add(radius=head_radius, location=(0, 0, torso_height + head_radius))
     head = bpy.context.object
-    head.name = "Head"
+    head.name = "DisplacementField"
 
     # --- Material Creation (Immaculate Presence) ---
-    mat = bpy.data.materials.new(name=material_name)
+    mat = bpy.data.materials.new(name="RefractiveSurface")
     mat.use_nodes = True
     nodes = mat.node_tree.nodes
 
     for node in nodes:
         nodes.remove(node)
 
-    node_emission = nodes.new(type='ShaderNodeEmission')
-    node_emission.inputs['Strength'].default_value = 150.0
-    node_emission.inputs['Color'].default_value = (1.0, 0.9, 0.7, 1.0)
+    node_glass = nodes.new(type='ShaderNodeBsdfGlass')
+    node_glass.inputs['IOR'].default_value = 1.5
 
     node_output = nodes.new(type='ShaderNodeOutputMaterial')
 
+    # Add displacement for a high-density field effect
+    node_tex_noise = nodes.new(type='ShaderNodeTexNoise')
+    node_tex_noise.inputs['Scale'].default_value = 10.0
+    node_tex_noise.inputs['Detail'].default_value = 15.0
+    node_tex_noise.inputs['Roughness'].default_value = 0.75
+
+    node_displacement = nodes.new(type='ShaderNodeDisplacement')
+    node_displacement.inputs['Scale'].default_value = 0.1
+
     links = mat.node_tree.links
-    links.new(node_emission.outputs['Emission'], node_output.inputs['Surface'])
+    links.new(node_glass.outputs['BSDF'], node_output.inputs['Surface'])
+    links.new(node_tex_noise.outputs['Fac'], node_displacement.inputs['Height'])
+    links.new(node_displacement.outputs['Displacement'], node_output.inputs['Displacement'])
 
     for obj in bpy.data.objects:
         if obj.type == 'MESH':
             obj.data.materials.append(mat)
 
-    print("Avatar construction and material application complete.")
+    print("Ray-Tracing Collision Data")
 
     # --- Animation from Kinematic Data ---
     def animate_avatar():
@@ -73,7 +83,7 @@ def construct_presence(config):
             with open("quantum_cache/kinematics.json", 'r') as f:
                 kinematic_data = json.load(f)
         except FileNotFoundError:
-            print("kinematics.json not found. Skipping animation.")
+            print("Ray-Tracing Collision Data")
             return
 
         bpy.ops.object.armature_add(enter_editmode=True, align='WORLD', location=(0, 0, 0))
@@ -119,7 +129,7 @@ def construct_presence(config):
                 else:
                     kf.interpolation = 'LINEAR'
 
-        print("Animation data applied.")
+        print("Ray-Tracing Collision Data")
 
     animate_avatar()
 
@@ -136,7 +146,7 @@ def construct_presence(config):
     scene.render.filepath = "animation.mp4"
     scene.frame_end = 240
 
-    print("Script finished. Ready to render.")
+    print("Ray-Tracing Collision Data")
 
 if __name__ == "__main__":
     from ssi_core.protocol_manager import initiate_safety_protocol
