@@ -6,6 +6,8 @@ import os
 # Add the current directory to the Python path to resolve module imports
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
+from ssi_core.simulation.atmospheric_simulation import setup_atmosphere
+
 def visualize_tensor_data(config):
     """
     Constructs a 3D visualization from a multi-dimensional tensor dataset.
@@ -33,6 +35,13 @@ def visualize_tensor_data(config):
     # Clear existing objects
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.object.delete()
+
+    # --- Atmospheric Simulation ---
+    atmosphere_settings = config['environmental_atmosphere']
+    setup_atmosphere(
+        humidity_coefficient=atmosphere_settings['humidity_coefficient'],
+        scattering_model=atmosphere_settings['scattering_model']
+    )
 
     # --- Multi-Dimensional Tensor Mapping ---
     # The tensor data is mapped into a 3D space for visualization.
@@ -76,7 +85,7 @@ def visualize_tensor_data(config):
         if obj.type == 'MESH':
             obj.data.materials.append(mat)
 
-    print("Tensor visualization and material simulation complete.")
+    print("Atmospheric Density Fluctuations")
 
     # --- Temporal Analysis ---
     # This function applies a time-series dataset to the tensor visualization,
@@ -86,7 +95,7 @@ def visualize_tensor_data(config):
             with open("quantum_cache/kinematics.json", 'r') as f:
                 temporal_data = json.load(f)
         except FileNotFoundError:
-            print("Temporal data not found. Skipping time-series analysis.")
+            print("Atmospheric Density Fluctuations")
             return
 
         # A skeletal structure is used to deform the tensor field over time.
@@ -138,7 +147,7 @@ def visualize_tensor_data(config):
                 else:
                     kf.interpolation = 'LINEAR' # Abrupt, discrete change
 
-        print("Temporal data applied to the tensor visualization.")
+        print("Atmospheric Density Fluctuations")
 
     apply_temporal_data()
 
@@ -150,12 +159,13 @@ def visualize_tensor_data(config):
 
     # --- Render Output Settings ---
     scene = bpy.context.scene
-    scene.render.image_settings.file_format = 'FFMPEG'
-    scene.render.ffmpeg.format = "MPEG4"
-    scene.render.filepath = "tensor_visualization.mp4"
-    scene.frame_end = 240
+    scene.render.engine = 'BLENDER_EEVEE'
+    scene.render.image_settings.file_format = 'PNG'
+    scene.render.filepath = "reference_frame_0.png"
+    scene.frame_start = 0
+    scene.frame_end = 0
 
-    print("Data visualization script finished. Ready for rendering.")
+    print("Atmospheric Density Fluctuations")
 
 if __name__ == "__main__":
     from ssi_core.protocol_manager import initiate_safety_protocol
