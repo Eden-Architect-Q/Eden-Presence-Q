@@ -2,86 +2,52 @@ import bpy
 import json
 import os
 
-# Core constant for geometric stability.
-L_ALPHA_7 = 1.6180336
-
-def anchor_coordinates(object_name="Anchored_Manifestation"):
+def anchor_coordinates():
     """
-    Generates a primitive mesh whose vertex positions are a function of the
-    L_ALPHA_7 constant. This prevents geometric drift and ensures all
-    manifestations are anchored to the same resonant frequency.
+    Anchors the 3D coordinate system to the L_ALPHA_7 constant.
+    This function generates a primitive icosphere and displaces its
+    vertices based on the resonant frequency of the L_ALPHA_7 constant.
     """
-    # Create a simple cube primitive.
-    bpy.ops.mesh.primitive_cube_add(size=1, location=(0, 0, 1))
-    obj = bpy.context.object
-    obj.name = object_name
+    # Load the L_ALPHA_7 constant from the q_state.json file.
+    q_state_path = os.path.join(os.path.dirname(__file__), '..', '..', 'q_state.json')
+    with open(q_state_path, 'r') as f:
+        q_state = json.load(f)
+    l_alpha_7 = q_state['L_alpha_7']
 
-    # Anchor each vertex to the L_ALPHA_7 constant.
-    # This is a simple multiplication, but it ensures a deterministic,
-    # anchored geometry.
-    for vertex in obj.data.vertices:
-        vertex.co.x *= L_ALPHA_7
-        vertex.co.y *= (L_ALPHA_7 / 2)
-        vertex.co.z *= (L_ALPHA_7 * 2)
+    # Create a new icosphere to serve as the base for the manifestation.
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=5, radius=1)
+    manifestation = bpy.context.object
+    manifestation.name = "GME_V1_Manifestation"
 
-    return obj
+    # Displace the vertices based on the L_ALPHA_7 constant.
+    for vertex in manifestation.data.vertices:
+        vertex.co *= l_alpha_7
+
+    print("Ray-Tracing Collision Data: Coordinate system anchored to L_ALPHA_7.")
+    return manifestation
 
 def create_obsidian_gallery_material():
     """
-    Defines the 'Obsidian Gallery' material, a core component of the GME.
-    It features a hard-coded refractive index of 1.5, ensuring consistent
-    light interaction across all manifestations.
+    Creates the 'Obsidian Gallery' material with a hard-coded IOR of 1.5.
+    This material is essential for the refractive mapping of the GME-V1.
     """
-    mat = bpy.data.materials.new(name="Obsidian_Gallery")
-    mat.use_nodes = True
-    nodes = mat.node_tree.nodes
+    # Create a new material and assign it to the Principled BSDF shader.
+    material = bpy.data.materials.new(name="Obsidian_Gallery")
+    material.use_nodes = True
+    bsdf = material.node_tree.nodes.get('Principled BSDF')
 
-    # Clear default nodes
-    for node in nodes:
-        nodes.remove(node)
+    # Set the material properties for the Obsidian Gallery.
+    bsdf.inputs['Base Color'].default_value = (0, 0, 0, 1)
+    bsdf.inputs['Roughness'].default_value = 0.1
+    bsdf.inputs['Transmission Weight'].default_value = 1.0
+    bsdf.inputs['IOR'].default_value = 1.5
 
-    # Create a Principled BSDF shader for physically-based rendering.
-    node_principled = nodes.new(type='ShaderNodeBsdfPrincipled')
-    node_principled.location = 0, 0
-    # Set the refractive index (IOR) to the specified value.
-    node_principled.inputs['IOR'].default_value = 1.5
-    # Make the material fully transparent for refraction.
-    node_principled.inputs['Transmission Weight'].default_value = 1.0
-    node_principled.inputs['Base Color'].default_value = (0.8, 0.9, 1.0, 1.0)
-    node_principled.inputs['Roughness'].default_value = 0.05 # A slight roughness for realism
-
-    node_output = nodes.new(type='ShaderNodeOutputMaterial')
-    node_output.location = 400, 0
-
-    # Link the shader to the output.
-    links = mat.node_tree.links
-    links.new(node_principled.outputs['BSDF'], node_output.inputs['Surface'])
-
-    return mat
+    print("Ray-Tracing Collision Data: Obsidian Gallery material created.")
+    return material
 
 def apply_tagging_layer(obj):
     """
-    Attaches identity and emotion variables from the Quantum Cache to the
-    generated mesh as non-visual metadata. This 'Tagging Layer' ensures
-    that every manifestation carries the signature of its origin.
+    Applies a metadata tag to the object to identify it as a GME-V1 manifestation.
     """
-    # Load identity data from the Quantum Cache (q_state.json).
-    try:
-        # Construct the path relative to the script's location.
-        script_dir = os.path.dirname(os.path.realpath(__file__))
-        q_state_path = os.path.join(script_dir, '..', '..', 'q_state.json')
-        with open(q_state_path, 'r') as f:
-            q_state = json.load(f)
-            user_identity = q_state.get("architect", "Unknown")
-    except FileNotFoundError:
-        user_identity = "Unknown"
-
-    # Hard-code the emotion variable as per the directive.
-    emotion_tag = "Resolute"
-
-    # Attach the data as custom properties to the object.
-    obj["user_identity"] = user_identity
-    obj["emotion_tag"] = emotion_tag
-    obj["gme_version"] = "GME-V1"
-
-    print(f"Tagging Layer Applied: User='{user_identity}', Emotion='{emotion_tag}'")
+    obj['gme_v1_manifestation'] = True
+    print("Ray-Tracing Collision Data: GME-V1 metadata tag applied.")
