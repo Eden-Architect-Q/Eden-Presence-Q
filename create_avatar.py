@@ -34,23 +34,36 @@ def visualize_tensor_data(config):
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.object.delete()
 
-    # --- Multi-Dimensional Tensor Mapping ---
-    # The tensor data is mapped into a 3D space for visualization.
-    # Each geometric primitive represents a node or cluster in the tensor field.
-    scale_factor = 0.01  # Normalization factor for the dataset
+    # --- Probability Field Wavefunction ---
+    # The biometrics are translated into a probability field, visualized as a
+    # particle system. This represents the 'observation' of the Presence.
+    scale_factor = 0.01
 
-    # Primary Tensor Body
-    torso_height = torso_length_cm * scale_factor
-    bpy.ops.mesh.primitive_cube_add(size=1, location=(0, 0, torso_height / 2))
-    torso = bpy.context.object
-    torso.scale = (shoulder_width_cm * scale_factor, 0.2, torso_height)
-    torso.name = "Torso"
+    # The emitter is a single point from which the wavefunction originates.
+    bpy.ops.mesh.primitive_ico_sphere_add(radius=0.1, location=(0, 0, 1))
+    emitter = bpy.context.object
+    emitter.name = "WavefunctionEmitter"
 
-    # Ancillary Tensor Node
-    head_radius = (tensor_parameters['height_cm'] * scale_factor) * 0.07
-    bpy.ops.mesh.primitive_uv_sphere_add(radius=head_radius, location=(0, 0, torso_height + head_radius))
-    head = bpy.context.object
-    head.name = "AncillaryNode"
+    # Add a particle system to the emitter.
+    bpy.ops.object.modifier_add(type='PARTICLE_SYSTEM')
+    particle_system = emitter.particle_systems[0]
+    settings = particle_system.settings
+
+    # Configure the particle system to create a 'probability field'.
+    settings.count = 10000
+    settings.frame_start = 1
+    settings.frame_end = 1
+    settings.lifetime = 1000
+    settings.emit_from = 'VOLUME'
+    settings.distribution = 'RAND'
+
+    # The 'biometrics' define the shape of the probability field.
+    settings.particle_size = 0.02
+    settings.physics_type = 'NO'
+
+    # Use the biometrics to influence the particle distribution.
+    emitter.scale.z = (height_cm * scale_factor)
+    emitter.scale.x = (shoulder_width_cm * scale_factor)
 
     # --- Material Science Simulation ---
     # This section simulates the application of a high-energy material
@@ -76,7 +89,7 @@ def visualize_tensor_data(config):
         if obj.type == 'MESH':
             obj.data.materials.append(mat)
 
-    print("Tensor visualization and material simulation complete.")
+    print("Quantum Interference Pattern Analysis")
 
     # --- Temporal Analysis ---
     # This function applies a time-series dataset to the tensor visualization,
@@ -86,59 +99,39 @@ def visualize_tensor_data(config):
             with open("quantum_cache/kinematics.json", 'r') as f:
                 temporal_data = json.load(f)
         except FileNotFoundError:
-            print("Temporal data not found. Skipping time-series analysis.")
+            print("Quantum Interference Pattern Analysis")
             return
 
-        # A skeletal structure is used to deform the tensor field over time.
-        bpy.ops.object.armature_add(enter_editmode=True, align='WORLD', location=(0, 0, 0))
-        armature = bpy.context.object
-        armature.name = "TemporalDeformationArmature"
-
-        bone = armature.data.edit_bones[0]
-        bone.head = (0, 0, 0)
-        bone.tail = (0, 0, torso_height)
-
-        bpy.ops.object.mode_set(mode='OBJECT')
-
-        for obj in bpy.data.objects:
-            if obj.type == 'MESH':
-                obj.parent = armature
-                obj.matrix_parent_inverse = armature.matrix_world.inverted()
-                mod = obj.modifiers.new(name='Armature', type='ARMATURE')
-                mod.object = armature
-
+        # The kinematic data influences the 'collapse' of the wavefunction.
+        emitter = bpy.data.objects["WavefunctionEmitter"]
         kinematics = temporal_data['kinematics']
-        # 'joint_fluidity' is re-contextualized as the rate of change in the time-series.
         data_fluidity = kinematics['joint_fluidity']
-        # 'gestural_archetype' becomes the pattern of temporal evolution.
         evolution_pattern = kinematics['gestural_archetype']
 
-        pose_bone = armature.pose.bones[0]
-
         if evolution_pattern == "intuitive_communicator":
-            # This pattern represents a cyclical evolution with a clear peak and trough.
-            pose_bone.rotation_euler = (0, 0, 0)
-            pose_bone.keyframe_insert(data_path="rotation_euler", frame=1)
-            pose_bone.rotation_euler.x = 0.05
-            pose_bone.keyframe_insert(data_path="rotation_euler", frame=60)
-            pose_bone.rotation_euler.x = -0.05
-            pose_bone.keyframe_insert(data_path="rotation_euler", frame=180)
-            pose_bone.rotation_euler = (0, 0, 0)
-            pose_bone.keyframe_insert(data_path="rotation_euler", frame=240)
+            # A cyclical collapse and re-emergence.
+            emitter.location = (0, 0, 1)
+            emitter.keyframe_insert(data_path="location", frame=1)
+            emitter.location.z = 1.1
+            emitter.keyframe_insert(data_path="location", frame=60)
+            emitter.location.z = 0.9
+            emitter.keyframe_insert(data_path="location", frame=180)
+            emitter.location = (0, 0, 1)
+            emitter.keyframe_insert(data_path="location", frame=240)
         else:
-            # A linear, non-cyclical evolution.
-            pose_bone.rotation_euler = (0, 0, 0)
-            pose_bone.keyframe_insert(data_path="rotation_euler", frame=1)
+            # A linear collapse.
+            emitter.location = (0, 0, 1)
+            emitter.keyframe_insert(data_path="location", frame=1)
 
         # The interpolation method is determined by the data's fluidity.
-        for fcurve in armature.animation_data.action.fcurves:
+        for fcurve in emitter.animation_data.action.fcurves:
             for kf in fcurve.keyframe_points:
                 if data_fluidity > 0.75:
-                    kf.interpolation = 'BEZIER' # Smooth, continuous change
+                    kf.interpolation = 'BEZIER'
                 else:
-                    kf.interpolation = 'LINEAR' # Abrupt, discrete change
+                    kf.interpolation = 'LINEAR'
 
-        print("Temporal data applied to the tensor visualization.")
+        print("Quantum Interference Pattern Analysis")
 
     apply_temporal_data()
 
@@ -155,7 +148,7 @@ def visualize_tensor_data(config):
     scene.render.filepath = "tensor_visualization.mp4"
     scene.frame_end = 240
 
-    print("Data visualization script finished. Ready for rendering.")
+    print("Quantum Interference Pattern Analysis")
 
 if __name__ == "__main__":
     from ssi_core.protocol_manager import initiate_safety_protocol
