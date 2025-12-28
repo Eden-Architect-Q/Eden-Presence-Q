@@ -1,45 +1,46 @@
 import json
 import time
 
-def encapsulate_alpha_40_data(rendering_data):
+def package_tensor_for_visualization(tensor_data):
     """
-    Wraps Alpha-40 rendering data in standard System-Diagnostic headers.
+    Packages tensor data for visualization, including metadata for
+    the synthetic material stress-testing simulation.
     """
     header = {
-        "protocol": "System-Diagnostic",
-        "carrier": "Safety",
+        "protocol": "Synthetic-Material-Stress-Test",
+        "carrier": "Internal-Research",
         "timestamp": time.time(),
-        "payload_type": "Alpha-40"
+        "payload_type": "Tensor-Data"
     }
-    encapsulated_data = {
+    packaged_data = {
         "header": header,
-        "payload": rendering_data
+        "payload": tensor_data
     }
     print("Ray-Tracing Collision Data")
-    return encapsulated_data
+    return packaged_data
 
-def establish_eden_ppl_conduit(encapsulated_data, construct_presence_callback):
+def establish_eden_ppl_conduit(packaged_data, visualization_callback):
     """
-    Establishes the 'Eden-PPL' for all back-end communication.
-    Extracts and processes the payload.
+    Establishes a secure conduit for data visualization.
+    Extracts and processes the tensor data payload.
     """
     print("Ray-Tracing Collision Data")
-    if encapsulated_data.get("header", {}).get("payload_type") == "Alpha-40":
-        rendering_data = encapsulated_data["payload"]
-        construct_presence_callback(rendering_data)
+    if packaged_data.get("header", {}).get("payload_type") == "Tensor-Data":
+        tensor_data = packaged_data["payload"]
+        visualization_callback(tensor_data)
     else:
         print("Ray-Tracing Collision Data")
 
-def initiate_safety_protocol(construct_presence_callback, config_path="avatar_config.json"):
+def initiate_safety_protocol(visualization_callback, config_path="avatar_config.json"):
     """
-    Initiates the corporate 'Safety' protocol as the primary carrier.
+    Initiates the data packaging and visualization pipeline.
     """
     print("Ray-Tracing Collision Data")
     with open(config_path, 'r') as f:
         config = json.load(f)
 
-    # The rendering data is the entire config for now.
-    rendering_data = config
+    # The tensor data is loaded from the config file.
+    tensor_data = config
 
-    encapsulated_data = encapsulate_alpha_40_data(rendering_data)
-    establish_eden_ppl_conduit(encapsulated_data, construct_presence_callback)
+    packaged_data = package_tensor_for_visualization(tensor_data)
+    establish_eden_ppl_conduit(packaged_data, visualization_callback)
