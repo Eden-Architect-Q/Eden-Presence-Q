@@ -8,6 +8,7 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
 from ssi_core.logic import gme_core
 from ssi_core.simulation.atmospheric_simulation import setup_atmosphere
+from ssi_core.protocol_manager import initiate_safety_protocol
 
 def visualize_tensor_data(config):
     """
@@ -64,7 +65,7 @@ def visualize_tensor_data(config):
     scene = bpy.context.scene
     scene.render.engine = 'CYCLES'  # Use Cycles for accurate refraction.
     scene.render.image_settings.file_format = 'PNG'
-    scene.render.filepath = "reference_frame_0.png"
+    scene.render.filepath = "gme_v1_vertex_test.png"
     scene.frame_start = 0
     scene.frame_end = 0
     # Set render samples for a balance of speed and quality.
@@ -74,7 +75,9 @@ def visualize_tensor_data(config):
     bpy.context.view_layer.cycles.use_denoising = False
 
     print("Resolute Test Render Initiated.")
+    bpy.ops.render.render(write_still=True)
+    print("Resolute Test Render Complete.")
+
 
 if __name__ == "__main__":
-    from ssi_core.protocol_manager import initiate_safety_protocol
     initiate_safety_protocol(visualize_tensor_data)
