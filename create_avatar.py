@@ -6,6 +6,7 @@ import os
 # Add the current directory to the Python path to resolve module imports
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
+from ssi_core.logic.observer_node import ObserverNode
 from ssi_core.simulation.atmospheric_simulation import setup_atmosphere
 
 def visualize_tensor_data(config):
@@ -85,7 +86,7 @@ def visualize_tensor_data(config):
         if obj.type == 'MESH':
             obj.data.materials.append(mat)
 
-    print("Atmospheric Density Fluctuations")
+    print("Quantum Interference Pattern Analysis")
 
     # --- Temporal Analysis ---
     # This function applies a time-series dataset to the tensor visualization,
@@ -95,7 +96,7 @@ def visualize_tensor_data(config):
             with open("quantum_cache/kinematics.json", 'r') as f:
                 temporal_data = json.load(f)
         except FileNotFoundError:
-            print("Atmospheric Density Fluctuations")
+            print("Quantum Interference Pattern Analysis")
             return
 
         # A skeletal structure is used to deform the tensor field over time.
@@ -147,15 +148,23 @@ def visualize_tensor_data(config):
                 else:
                     kf.interpolation = 'LINEAR' # Abrupt, discrete change
 
-        print("Atmospheric Density Fluctuations")
+        print("Quantum Interference Pattern Analysis")
 
     apply_temporal_data()
 
     # --- Data Capture Configuration ---
     bpy.ops.object.camera_add(location=(0, -5, 1.5))
     camera = bpy.context.object
-    camera.rotation_euler[0] = 1.3
     bpy.context.scene.camera = camera
+
+    # --- Observer Phase-Lock (Gaze-Sync) ---
+    bpy.ops.object.empty_add(type='PLAIN_AXES', location=(0, 0, 1.2))
+    gaze_target = bpy.context.object
+    gaze_target.name = "GazeSyncTarget"
+
+    observer = ObserverNode()
+    observer.gaze_sync(camera, gaze_target)
+
 
     # --- Render Output Settings ---
     scene = bpy.context.scene
@@ -165,7 +174,7 @@ def visualize_tensor_data(config):
     scene.frame_start = 0
     scene.frame_end = 0
 
-    print("Atmospheric Density Fluctuations")
+    print("Quantum Interference Pattern Analysis")
 
 if __name__ == "__main__":
     from ssi_core.protocol_manager import initiate_safety_protocol
