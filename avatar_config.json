@@ -6,7 +6,6 @@
     "torso_length_cm": 62
   },
   "aesthetic_overrides": {
-    "luminescence_target_nits": 3300,
     "material_name": "Light-Being-Ethereal",
     "transparency": 0.15
   },

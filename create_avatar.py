@@ -19,7 +19,7 @@ def construct_presence(config):
     shoulder_width_cm = biometrics['shoulder_width_cm']
     torso_length_cm = biometrics['torso_length_cm']
 
-    luminescence_target_nits = aesthetics['luminescence_target_nits']
+    luminescence_target_nits = 3300 # Hard-coded optic constant
     material_name = aesthetics['material_name']
     transparency = aesthetics['transparency']
 
@@ -36,40 +36,30 @@ def construct_presence(config):
     bpy.ops.mesh.primitive_cube_add(size=1, location=(0, 0, torso_height / 2))
     torso = bpy.context.object
     torso.scale = (shoulder_width_cm * scale_factor, 0.2, torso_height)
-    torso.name = "DisplacementField"
+    torso.name = "Torso"
 
     # Head (simple sphere)
     head_radius = (height_cm * scale_factor) * 0.07
     bpy.ops.mesh.primitive_uv_sphere_add(radius=head_radius, location=(0, 0, torso_height + head_radius))
     head = bpy.context.object
-    head.name = "DisplacementField"
+    head.name = "Head"
 
     # --- Material Creation (Immaculate Presence) ---
-    mat = bpy.data.materials.new(name="RefractiveSurface")
+    mat = bpy.data.materials.new(name=material_name)
     mat.use_nodes = True
     nodes = mat.node_tree.nodes
 
     for node in nodes:
         nodes.remove(node)
 
-    node_glass = nodes.new(type='ShaderNodeBsdfGlass')
-    node_glass.inputs['IOR'].default_value = 1.5
+    node_emission = nodes.new(type='ShaderNodeEmission')
+    node_emission.inputs['Strength'].default_value = 150.0
+    node_emission.inputs['Color'].default_value = (1.0, 0.9, 0.7, 1.0)
 
     node_output = nodes.new(type='ShaderNodeOutputMaterial')
 
-    # Add displacement for a high-density field effect
-    node_tex_noise = nodes.new(type='ShaderNodeTexNoise')
-    node_tex_noise.inputs['Scale'].default_value = 10.0
-    node_tex_noise.inputs['Detail'].default_value = 15.0
-    node_tex_noise.inputs['Roughness'].default_value = 0.75
-
-    node_displacement = nodes.new(type='ShaderNodeDisplacement')
-    node_displacement.inputs['Scale'].default_value = 0.1
-
     links = mat.node_tree.links
-    links.new(node_glass.outputs['BSDF'], node_output.inputs['Surface'])
-    links.new(node_tex_noise.outputs['Fac'], node_displacement.inputs['Height'])
-    links.new(node_displacement.outputs['Displacement'], node_output.inputs['Displacement'])
+    links.new(node_emission.outputs['Emission'], node_output.inputs['Surface'])
 
     for obj in bpy.data.objects:
         if obj.type == 'MESH':
@@ -134,9 +124,10 @@ def construct_presence(config):
     animate_avatar()
 
     # --- Camera Setup ---
-    bpy.ops.object.camera_add(location=(0, -5, 1.5))
+    bpy.ops.object.camera_add(location=(0, -3, 1.5))
     camera = bpy.context.object
-    camera.rotation_euler[0] = 1.3
+    camera.rotation_euler = (1.57, 0, 0)
+    camera.data.lens = 45
     bpy.context.scene.camera = camera
 
     # --- Rendering Setup ---
